@@ -18,7 +18,7 @@ function TorrentStream(options) {
     name: options.name,
     pieces: new Buffer(0),
     length: 0,
-    "piece length": options.pieceLength
+    "piece length": this.pieceLength
   };
 
   if (options.private) {
