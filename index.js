@@ -73,7 +73,7 @@ TorrentStream.prototype._flush = function(done) {
 
   var metadata = {
     announce: self.announce,
-    'announce-list': self.trackers,
+    'announce-list': [ self.trackers ], // note: array of arrays
     'creation date': parseInt(Date.now() / 1000),
     info: self.info
   };
