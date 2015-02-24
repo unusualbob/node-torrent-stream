@@ -17,3 +17,23 @@ var ts = new Torrent({
 
 rs.pipe(ts);
 ts.pipe(ws);
+
+
+/**
+ * Mutli-file example
+ */
+
+var rs1 = fs.createReadStream('./README.md');
+var rs2 = fs.createReadStream('./license.md');
+var nws = fs.createWriteStream('./multi' + Date.now() + '.torrent');
+
+var mts = new Torrent({
+  announce: "http://totally_a_real_tracker.com/announce",
+  name: "MyDirectory",
+  encoding: 'UTF-8',
+  pieceLength: 2097152
+});
+
+mts.addFile(rs1, 'readme.md');
+mts.addFile(rs2, 'license.md');
+mts.pipe(nws);
