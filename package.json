@@ -1,7 +1,11 @@
 {
   "name": "node-torrent-stream",
   "description": "Create torrent file from a readStream",
-  "keywords": ["torrent", "bittorremt", "stream"],
+  "keywords": [
+    "torrent",
+    "bittorremt",
+    "stream"
+  ],
   "version": "0.0.1",
   "repository": {
     "type": "git",
@@ -9,10 +13,13 @@
   },
   "author": "Rob Riddle (https://github.com/unusualbob)",
   "dependencies": {
+    "async": "^0.9.0",
     "bncode": "~0.5.2"
   },
-  "licenses": [{
-    "type": "GPL",
-    "url" : "http://github.com/fent/node-torrent/raw/master/LICENSE"
-  }]
+  "licenses": [
+    {
+      "type": "GPL",
+      "url": "https://raw.github.com/unusualbob/node-torrent-stream/master/license.md"
+    }
+  ]
 }
