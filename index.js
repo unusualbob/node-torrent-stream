@@ -13,21 +13,26 @@ function TorrentStream(options) {
   this.pieceLength = options.pieceLength || 262144;
 
   this.announce = options.announce;
+  this.trackers = options.trackers;
   this.createdBy = options.createdBy;
 
-  if (!options.announce) {
-    throw new Error("Torrent announce url is required");
+  if (!this.announce && this.trackers && this.trackers.length) {
+    this.announce = this.trackers[0];
+  }
+  
+  if (!this.announce){
+    throw new Error('Torrent announce url is required');
   }
 
   if (!options.name) {
-    throw new Error("Torrent name is required");
+    throw new Error('Torrent name is required');
   }
 
   this.info = {
     name: options.name,
     pieces: new Buffer(0),
     length: 0,
-    "piece length": this.pieceLength
+    'piece length': this.pieceLength
   };
 
   if (options.private) {
@@ -68,12 +73,13 @@ TorrentStream.prototype._flush = function(done) {
 
   var metadata = {
     announce: self.announce,
-    "creation date": parseInt(Date.now() / 1000),
+    'announce-list': self.trackers,
+    'creation date': parseInt(Date.now() / 1000),
     info: self.info
   };
 
   if (self.createdBy) {
-    metadata["created by"] = self.createdBy;
+    metadata['created by'] = self.createdBy;
   }
 
   if (self.encoding) {
@@ -103,7 +109,7 @@ TorrentStream.prototype.addFile = function addFile(stream, fileName) {
   stream.pause();
 
   if (this.complete) {
-    throw new Error("Torrent.addFile was called after stream was already finished");
+    throw new Error('Torrent.addFile was called after stream was already finished');
   }
 
   this.streams.push({s: stream, name: fileName});
@@ -116,7 +122,7 @@ TorrentStream.prototype.addFile = function addFile(stream, fileName) {
 TorrentStream.prototype._start = function start() {
   var self = this;
   if (!self.streams || self.streams.length === 0) {
-    throw new Error("No streams to process");
+    throw new Error('No streams to process');
   }
 
   self.info.files = [];
