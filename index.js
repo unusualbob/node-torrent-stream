@@ -82,6 +82,7 @@ TorrentStream.prototype._flush = function(done) {
 
   var data = bencode.encode(metadata);
   self.push(data);
+  self.complete = true;
   done();
 };
 
@@ -100,6 +101,11 @@ TorrentStream.prototype.addFile = function addFile(stream, fileName) {
     this.streams = [];
   }
   stream.pause();
+
+  if (this.complete) {
+    throw new Error("Torrent.addFile was called after stream was already finished");
+  }
+
   this.streams.push({s: stream, name: fileName});
 
   if (!this.info.files) {
