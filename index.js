@@ -1,10 +1,10 @@
 /* Created by Rob Riddle 2015 */
 
-var inherits  = require('util').inherits;
-var Transform = require('stream').Transform;
-var async     = require('async');
-var crypto    = require('crypto');
-var bencode   = require('bncode');
+var inherits  = require("util").inherits;
+var Transform = require("stream").Transform;
+var async     = require("async");
+var crypto    = require("crypto");
+var bencode   = require("bncode");
 
 function TorrentStream(options) {
   Transform.call(this);
@@ -21,18 +21,18 @@ function TorrentStream(options) {
   }
   
   if (!this.announce){
-    throw new Error('Torrent announce url is required');
+    throw new Error("Torrent announce url is required");
   }
 
   if (!options.name) {
-    throw new Error('Torrent name is required');
+    throw new Error("Torrent name is required");
   }
 
   this.info = {
     name: options.name,
     pieces: new Buffer(0),
     length: 0,
-    'piece length': this.pieceLength
+    "piece length": this.pieceLength
   };
 
   if (options.private) {
@@ -73,13 +73,13 @@ TorrentStream.prototype._flush = function(done) {
 
   var metadata = {
     announce: self.announce,
-    'announce-list': [ self.trackers ], // note: array of arrays
-    'creation date': parseInt(Date.now() / 1000),
+    "announce-list": [ self.trackers ], // note: array of arrays
+    "creation date": parseInt(Date.now() / 1000),
     info: self.info
   };
 
   if (self.createdBy) {
-    metadata['created by'] = self.createdBy;
+    metadata["created by"] = self.createdBy;
   }
 
   if (self.encoding) {
@@ -95,7 +95,7 @@ TorrentStream.prototype._flush = function(done) {
 TorrentStream.prototype._processPiece = function processPiece(length) {
   var self = this;
   var piece = self.buffer.slice(0, length);
-  var pieceHash = new Buffer(crypto.createHash('sha1').update(piece).digest(), 'binary');
+  var pieceHash = new Buffer(crypto.createHash("sha1").update(piece).digest(), "binary");
 
   self.buffer = self.buffer.slice(length);
   self.info.pieces = Buffer.concat([self.info.pieces, pieceHash]);
@@ -109,7 +109,7 @@ TorrentStream.prototype.addFile = function addFile(stream, fileName) {
   stream.pause();
 
   if (this.complete) {
-    throw new Error('Torrent.addFile was called after stream was already finished');
+    throw new Error("Torrent.addFile was called after stream was already finished");
   }
 
   this.streams.push({s: stream, name: fileName});
@@ -122,7 +122,7 @@ TorrentStream.prototype.addFile = function addFile(stream, fileName) {
 TorrentStream.prototype._start = function start() {
   var self = this;
   if (!self.streams || self.streams.length === 0) {
-    throw new Error('No streams to process');
+    throw new Error("No streams to process");
   }
 
   self.info.files = [];
@@ -133,7 +133,7 @@ TorrentStream.prototype._start = function start() {
       length: 0
     });
     stream.s.pipe(self, {end: false});
-    stream.s.on('end', function() {
+    stream.s.on("end", function() {
       callback();
     });
     stream.s.resume();
