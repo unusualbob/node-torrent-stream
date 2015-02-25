@@ -1,10 +1,10 @@
 /* Created by Rob Riddle 2015 */
 
-var inherits  = require('util').inherits;
-var Transform = require('stream').Transform;
-var async     = require('async');
-var crypto    = require('crypto');
-var bencode   = require('bncode');
+var inherits  = require("util").inherits;
+var Transform = require("stream").Transform;
+var async     = require("async");
+var crypto    = require("crypto");
+var bencode   = require("bncode");
 
 function TorrentStream(options) {
   Transform.call(this);
@@ -13,9 +13,14 @@ function TorrentStream(options) {
   this.pieceLength = options.pieceLength || 262144;
 
   this.announce = options.announce;
+  this.trackers = options.trackers;
   this.createdBy = options.createdBy;
 
-  if (!options.announce) {
+  if (!this.announce && this.trackers && this.trackers.length) {
+    this.announce = this.trackers[0];
+  }
+  
+  if (!this.announce){
     throw new Error("Torrent announce url is required");
   }
 
@@ -68,6 +73,7 @@ TorrentStream.prototype._flush = function(done) {
 
   var metadata = {
     announce: self.announce,
+    "announce-list": [ self.trackers ], // note: array of arrays
     "creation date": parseInt(Date.now() / 1000),
     info: self.info
   };
@@ -89,7 +95,7 @@ TorrentStream.prototype._flush = function(done) {
 TorrentStream.prototype._processPiece = function processPiece(length) {
   var self = this;
   var piece = self.buffer.slice(0, length);
-  var pieceHash = new Buffer(crypto.createHash('sha1').update(piece).digest(), 'binary');
+  var pieceHash = new Buffer(crypto.createHash("sha1").update(piece).digest(), "binary");
 
   self.buffer = self.buffer.slice(length);
   self.info.pieces = Buffer.concat([self.info.pieces, pieceHash]);
@@ -127,7 +133,7 @@ TorrentStream.prototype._start = function start() {
       length: 0
     });
     stream.s.pipe(self, {end: false});
-    stream.s.on('end', function() {
+    stream.s.on("end", function() {
       callback();
     });
     stream.s.resume();
