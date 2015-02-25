@@ -21,5 +21,8 @@
       "type": "GPL",
       "url": "https://raw.github.com/unusualbob/node-torrent-stream/master/license.md"
     }
-  ]
+  ],
+  "devDependencies": {
+    "chai": "^2.1.0"
+  }
 }
