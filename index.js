@@ -1,10 +1,10 @@
 /* Created by Rob Riddle 2015 */
 
-var inherits  = require('util').inherits;
-var Transform = require('stream').Transform;
-var async     = require('async');
-var crypto    = require('crypto');
-var bencode   = require('bncode');
+var inherits  = require("util").inherits;
+var Transform = require("stream").Transform;
+var async     = require("async");
+var crypto    = require("crypto");
+var bencode   = require("bncode");
 
 function TorrentStream(options) {
   Transform.call(this);
@@ -80,8 +80,7 @@ TorrentStream.prototype._flush = function(done) {
     metadata.encoding = self.encoding;
   }
 
-  var data = bencode.encode(metadata);
-  self.push(data);
+  self.push(bencode.encode(metadata));
   self.complete = true;
   done();
 };
@@ -89,7 +88,7 @@ TorrentStream.prototype._flush = function(done) {
 TorrentStream.prototype._processPiece = function processPiece(length) {
   var self = this;
   var piece = self.buffer.slice(0, length);
-  var pieceHash = new Buffer(crypto.createHash('sha1').update(piece).digest(), 'binary');
+  var pieceHash = new Buffer(crypto.createHash("sha1").update(piece).digest(), "binary");
 
   self.buffer = self.buffer.slice(length);
   self.info.pieces = Buffer.concat([self.info.pieces, pieceHash]);
@@ -122,14 +121,36 @@ TorrentStream.prototype._start = function start() {
   self.info.files = [];
 
   async.eachSeries(self.streams, function(stream, callback) {
+    //Track if we've already closed the primary stream to prevent double callbacks
+    var closed = false;
+
+    //Add file to metadata info
     self.info.files.push({
       path: [stream.name],
       length: 0
     });
+
+    //Pipe file stream into torrent stream
     stream.s.pipe(self, {end: false});
-    stream.s.on('end', function() {
-      callback();
+
+    //Handle file stream end event separately
+    stream.s.on("end", function() {
+      if (!closed) {
+        closed = true;
+        callback();
+      }
     });
+
+    //Handle file stream error event separately
+    stream.s.on("error", function(err) {
+      if (!closed) {
+        closed = true;
+        self.emit("error", err);
+        return callback(err);
+      }
+    });
+
+    //Un-pause file stream
     stream.s.resume();
   }, function (err) {
     self.end();
