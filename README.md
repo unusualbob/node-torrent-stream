@@ -1,5 +1,6 @@
 # node-torrent-stream
-Create a torrent from a readStream in node.js
+Create a torrent from a readStream in node.js  
+[![Build Status](https://travis-ci.org/unusualbob/node-torrent-stream.svg?branch=master)](https://travis-ci.org/unusualbob/node-torrent-stream)
 
 #Usage
 ```
