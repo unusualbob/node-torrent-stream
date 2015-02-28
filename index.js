@@ -15,7 +15,31 @@ function TorrentStream(options) {
   this.announce = options.announce;
   this.createdBy = options.createdBy;
 
-  if (!options.announce) {
+  if (options.trackers) {
+    if (!Array.isArray(options.trackers)) {
+      throw new Error("Torrent trackers must be an array");
+    }
+
+    options.trackers.forEach(function(trackerList) {
+      if (!Array.isArray(trackerList)) {
+        throw new Error("Tracker list " + trackerList + " in trackers is not an array");
+      }
+      trackerList.forEach(function(tracker) {
+        if (typeof tracker !== "string") {
+          throw new Error("Invalid tracker: Tracker is not a string");
+        }
+      });
+    });
+
+    this.trackers = options.trackers;
+
+    //Set announce to first tracker if not already set
+    if (!this.announce) {
+      this.announce = this.trackers[0][0];
+    }
+  }
+
+  if (!this.announce) {
     throw new Error("Torrent announce url is required");
   }
 
@@ -34,11 +58,9 @@ function TorrentStream(options) {
     this.info.private = 1;
   }
 
-  if (options.encoding) {
-    this.encoding = options.encoding;
-  }
+  this.encoding = options.encoding || 'utf8';
 
-  this.buffer = new Buffer(0);
+  this.buffer = new Buffer(0, this.encoding);
 }
 
 inherits(TorrentStream, Transform);
@@ -78,6 +100,10 @@ TorrentStream.prototype._flush = function(done) {
 
   if (self.encoding) {
     metadata.encoding = self.encoding;
+  }
+
+  if (self.trackers) {
+    metadata["announce-list"] = self.trackers;
   }
 
   self.push(bencode.encode(metadata));

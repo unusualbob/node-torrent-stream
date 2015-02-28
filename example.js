@@ -37,3 +37,18 @@ var mts = new Torrent({
 mts.addFile(rs1, 'readme.md');
 mts.addFile(rs2, 'license.md');
 mts.pipe(nws);
+
+/**
+ * Multi-tracker example
+ */
+
+var rs3 = fs.createReadStream('./README.md');
+var tws = fs.createWriteStream('./tracker' + Date.now() + '.torrent');
+
+var ts2 = new Torrent({
+  name: "ReadMe",
+  trackers: [["tracker1", "tracker2"], ["backup1"]]
+});
+
+rs3.pipe(ts2);
+ts2.pipe(tws);
