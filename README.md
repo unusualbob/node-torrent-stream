@@ -2,11 +2,12 @@
 Create a torrent from a readStream in node.js  
 [![Build Status](https://travis-ci.org/unusualbob/node-torrent-stream.svg?branch=master)](https://travis-ci.org/unusualbob/node-torrent-stream)
 
-#Usage
+# Usage
 ```
 var torrent = new Torrent(options);
 ```
-###Options
+
+### Options
 `announce: {String, required}` - The url of the torrent tracker, this is required unless `trackers` is included  
 `name: {String, required}` - The name of this torrent  
 `trackers: {Array of Arrays of Strings}` - List of torrent tracker URLs that this torrent is published to  
@@ -20,15 +21,15 @@ var torrent = new Torrent(options);
 `path: {String, required}` - A string representation of the path for this file, ex: 'file.txt'  
 
 
-###Multi-tracker format
+### Multi-tracker format
 The multi-tracker format for torrent files is as follows:  
 `[['http://tracker1', 'http://tracker2'], ['http://backupTracker1']]`  
 For a full view on the multi-tracker spec go here: [http://bittorrent.org/beps/bep_0012.html](http://bittorrent.org/beps/bep_0012.html)
 
 
-#Examples
+# Examples
 
-##Single file
+## Single file
 ```
 var fs = require('fs');
 var Torrent = require('node-torrent-stream');
@@ -47,7 +48,7 @@ x.pipe(ws);
 
 ```
 
-##Multi-file
+## Multi-file
 
 ```
 var rs1 = fs.createReadStream('./README.md');
